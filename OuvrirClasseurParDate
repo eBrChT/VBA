@@ -1,0 +1,27 @@
+Sub OuvrirClasseurParDate(dateEntree As Date)
+    Dim nomFichier As String
+    Dim chemin As String
+    Dim ws As Worksheet
+    
+    ' Générer le nom du fichier basé sur la date entrée
+    nomFichier = Format(dateEntree, "yyyymmdd") & ".csv"
+    
+    ' Définir le chemin du fichier (ajoute ici le dossier où se trouve le fichier)
+    chemin = "\\172.17.1.41\scada\Backup\daily_export\" & nomFichier  ' Remplace par le chemin correct
+    
+    ' Essayer d'ouvrir le fichier avec point-virgule comme séparateur
+    On Error GoTo ErreurOuverture
+    
+    ' Utilisation de QueryTable pour ouvrir le fichier CSV avec le séparateur point-virgule
+    Set ws = ThisWorkbook.Sheets.Add
+    ws.Name = "temp" ' Nommer la feuille créée "temp"
+    
+    With ws.QueryTables.Add(Connection:="TEXT;" & chemin, Destination:=ws.Range("A1"))
+    .TextFileConsecutiveDelimiter = False
+    .TextFileTabDelimiter = False
+    .TextFileSemicolonDelimiter = True ' Utilisation du séparateur point-virgule
+    .TextFileSpaceDelimiter = False ' Ne pas utiliser l'espace comme séparateur
+    .TextFileParseType = xlDelimited
+    .TextFileColumnDataTypes = Array(1)
+    .Refresh BackgroundQuery:=False
+End With
